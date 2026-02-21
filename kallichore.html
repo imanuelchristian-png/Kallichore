@@ -1,0 +1,208 @@
+# Kallichore
+web for kallichore group 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kallichore - Modular Control Center</title>
+    <style>
+        :root {
+            --accent: #00ffcc;
+            --bg: #05080a;
+            --panel-bg: #0f172a;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* Layout Utama - Grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto auto;
+            gap: 20px;
+            max-width: 1300px;
+            margin: auto;
+        }
+
+        /* Styling Panel Umum */
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .panel-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .panel-title::before {
+            content: "●";
+            margin-right: 8px;
+            font-size: 10px;
+        }
+
+        /* Input Styles */
+        input, select {
+            width: 100%;
+            padding: 10px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        /* PREVIEW UTAMA (Tengah-Tengah) */
+        .main-preview {
+            grid-column: span 3;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-bottom: 5px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 40px;
+            border-radius: 20px;
+        }
+
+        .flag-frame {
+            width: 320px;
+            height: 180px;
+            background: #000;
+            border: 4px solid #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        #v-flag { width: 100%; height: 100%; object-fit: cover; }
+
+        .rank-big {
+            font-size: 120px;
+            font-weight: 900;
+            color: var(--accent);
+            text-shadow: 0 0 20px var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .dashboard { grid-template-columns: 1fr; }
+            .main-preview { grid-column: span 1; flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<h1 style="text-align: center; font-weight: 300; letter-spacing: 5px;">COMMAND CENTER <span style="color:var(--accent)">KALLICHORE</span></h1>
+
+<div class="dashboard">
+    
+    <div class="panel">
+        <div class="panel-title">Modul Identitas</div>
+        <label>Nama Negara</label>
+        <input type="text" id="in-nama" value="Negfik Kallichore" oninput="update()">
+        <label>Nama Ideologi</label>
+        <input type="text" id="in-ideo" value="Techno-Capitalism" oninput="update()">
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">Modul Visual & Warna</div>
+        <label>Upload Bendera</label>
+        <input type="file" accept="image/*" onchange="uploadFlag(event)">
+        <label>Tema Warna Dashboard</label>
+        <input type="color" id="in-color" value="#00ffcc" oninput="update()">
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">Modul Sumber Daya</div>
+        <label>Populasi</label>
+        <input type="number" id="in-pop" value="100000000" oninput="update()">
+        <label>Militer</label>
+        <input type="number" id="in-mil" value="500000" oninput="update()">
+    </div>
+
+    <div class="main-preview">
+        <div class="flag-section">
+            <div class="flag-frame">
+                <img id="v-flag" src="https://via.placeholder.com/320x180/111/fff?text=No+Flag">
+            </div>
+            <h2 id="v-nama" style="margin-top: 15px;">COUNTRY NAME</h2>
+            <div id="v-ideo" style="color: var(--accent); letter-spacing: 2px; font-weight: bold;">IDEOLOGY</div>
+        </div>
+
+        <div class="rank-section" style="text-align: center;">
+            <div style="font-size: 0.8rem; letter-spacing: 4px;">GLOBAL STATUS RANK</div>
+            <div id="v-rank" class="rank-big">S</div>
+            <div id="v-status" style="font-style: italic; opacity: 0.7;">Analytic Pending...</div>
+        </div>
+
+        <div class="stats-section">
+            <div style="margin-bottom: 10px;">PDB: <span id="v-pdb" style="color: var(--accent); font-weight: bold;">0</span></div>
+            <div style="margin-bottom: 10px;">MIL: <span id="v-mil" style="color: var(--accent); font-weight: bold;">0</span></div>
+            <div style="margin-bottom: 10px;">POP: <span id="v-pop" style="color: var(--accent); font-weight: bold;">0</span></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function uploadFlag(e) {
+        const reader = new FileReader();
+        reader.onload = function() {
+            document.getElementById('v-flag').src = reader.result;
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    }
+
+    function update() {
+        // Inputs
+        const nama = document.getElementById('in-nama').value;
+        const ideo = document.getElementById('in-ideo').value;
+        const color = document.getElementById('in-color').value;
+        const pop = parseFloat(document.getElementById('in-pop').value) || 1;
+        const mil = parseFloat(document.getElementById('in-mil').value) || 0;
+
+        // Apply Theme
+        document.documentElement.style.setProperty('--accent', color);
+
+        // Calculations
+        const milRatio = (mil / pop) * 100;
+        let rank = "C";
+        let status = "Powerless";
+
+        if(milRatio > 5) { rank = "S"; status = "Militarized Superpower"; }
+        else if(milRatio > 2) { rank = "A"; status = "Regional Stronghold"; }
+        else if(milRatio > 1) { rank = "B"; status = "Stable Nation"; }
+        else { rank = "C"; status = "Neutral Territory"; }
+
+        // Outputs
+        document.getElementById('v-nama').innerText = nama.toUpperCase();
+        document.getElementById('v-ideo').innerText = ideo.toUpperCase();
+        document.getElementById('v-rank').innerText = rank;
+        document.getElementById('v-status').innerText = status;
+        document.getElementById('v-pop').innerText = (pop/1000000).toFixed(1) + " M";
+        document.getElementById('v-mil').innerText = (mil/1000).toFixed(0) + " K";
+        document.getElementById('v-pdb').innerText = "$" + (pop * 0.05).toFixed(0) + " B";
+    }
+
+    // Run on start
+    update();
+</script>
+
+</body>
+  </html>
+  
